@@ -1,0 +1,30 @@
+name: Publicar imagenes
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      # Paso 1: Checkout del código fuente
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Paso 2: Docker Login
+      - name: Docker Login
+        run: |
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
+
+      # Paso 3: Build y push del backend
+      - name: Build and push Backend
+        run: |
+          docker build ./TP-FINAL-Mio/backend -f ./TP-FINAL-Mio/backend/Dockerfile -t ${{ secrets.DOCKERHUB_USER }}/backendhia:latest
+          docker push ${{ secrets.DOCKERHUB_USER }}/backendhia:latest
+
+      # Paso 4: Build y push del frontend
+      - name: Build and push Frontend
+        run: |
+          docker build ./TP-FINAL-Mio/frontend -f ./TP-FINAL-Mio/frontend/Dockerfile -t ${{ secrets.DOCKERHUB_USER }}/frontendhia:latest
+          docker push ${{ secrets.DOCKERHUB_USER }}/frontendhia:latest
